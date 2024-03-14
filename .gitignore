@@ -1,0 +1,6 @@
+.env
+yarn.lock
+logs
+node_modules
+src/etcFiles/proxyIdx.txt
+src/kurve/shopee/google/token/*
