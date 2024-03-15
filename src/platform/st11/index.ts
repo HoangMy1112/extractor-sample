@@ -21,16 +21,21 @@ export async function st11Main() {
   console.info(allProducts) // Log or return all products after the loop
 }
 
-export const st11MainDetailPage = async (url: string) => {
+export const st11MainDetailPage = async (url: string, url2? : string) => {
   try {
     const content = await customRequest({ url, method: 'GET' })
+    let content2;
+    if (url2) {
+      content2 = await customRequest({ url: url2, method: 'GET' });
+    }
 
     let productDetails: any
     if (url.includes('/v1/')) {
-      productDetails = st11ProductDetailApiExtractor(content)
+      productDetails = st11ProductDetailApiExtractor(content, content2)
     } else {
       productDetails = st11ProductDetailHTMLExtractor(content)
     }
+
 
     console.info(productDetails)
     return productDetails
@@ -40,4 +45,5 @@ export const st11MainDetailPage = async (url: string) => {
   }
 }
 
-st11MainDetailPage('https://www.11st.co.kr/products/2366299950')
+st11MainDetailPage('https://www.11st.co.kr/products/v1/pc/products/6280549329/detail?redirectedOptionYn=N&trTypeCd=MAS99&trCtgrNo=585021&redirectedRequestYn=N', 'https://www.11st.co.kr/products/v1/products/6280549329/tab-property')
+//st11MainDetailPage('https://www.11st.co.kr/products/pa/6280549329?trTypeCd=MAS99&trCtgrNo=585021&redirectedRequestYn=N&redirectedOptionYn=N')

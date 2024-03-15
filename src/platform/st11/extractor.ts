@@ -47,7 +47,7 @@ export function st11SearchExtractor(json: any, products: productDetailsParams[])
   return products
 }
 
-export const st11ProductDetailApiExtractor = (jsonData: any) => {
+export const st11ProductDetailApiExtractor = (jsonData: any, jsonData2? : any) => {
   const productName = jsonData?.title?.name || 'No product name available'
 
   const originalPrice = jsonData?.price?.sellPrice || 0
@@ -61,11 +61,13 @@ export const st11ProductDetailApiExtractor = (jsonData: any) => {
   const point = discountPrice - price
   const discountRate = 100 - (price * 100 / originalPrice)
   const deliveryText = jsonData?.retailDelivery?.deliveryInfo.deliveryText.text || jsonData?.delivery?.text || ''
-  const sellerEmail = ''
+  let sellerEmail = jsonData2?.seller?.email || 'No email available';
   const optionInfo = ''
   const jobUrl = ''
   const options = ''
   const deliveryFee = ''
+
+
 
   const productDetails = {
     uid,
@@ -95,9 +97,6 @@ export const st11ProductDetailHTMLExtractor = (html: string) => {
   const dom = new JSDOM(html)
   const { document } = dom.window
   const Price = '0'
-  // const complexPriceString = (document.querySelector('#layBodyWrap > div > div.s_product.s_product_detail > div.l_product_cont_wrap > div > div.l_product_view_wrap > div.l_product_summary > div.l_product_side_info > div.b_product_info_price.b_product_info_price_style2 > div > div')?.textContent?.trim() || 'No price')
-  // const matches = complexPriceString.match(/\d{1,3}(,\d{3})*(\.\d+)?/g)
-
   const originalPriceSelector = '#finalDscPrcArea > dd > strong > span.value'
 
   const productNameSelector = '.c_product_info_title h1'
@@ -106,7 +105,7 @@ export const st11ProductDetailHTMLExtractor = (html: string) => {
   const sellerEmailSelector = '#tabpanelDetail4 > div > table:nth-child(9) > tbody > tr:nth-child(4) > td'
   const productIDSelector = '#tabpanelDetail1 > table > tbody > tr:nth-child(1) > td:nth-child(4)'
   const deliveryFeeSelector = '#layBodyWrap > div > div.s_product.s_product_detail > div.l_product_cont_wrap > div > div.l_product_buy_wrap.fixed_sm > div.l_product_buy_result > div.total_wrap.c_product_buy_price > ul > li:nth-child(2) > span'
-  
+
 
   const productName = document.querySelector(productNameSelector)?.textContent?.trim() || ''
   const originalPrice = document.querySelector(originalPriceSelector)?.textContent?.trim().replace(/[^\d,]/g, '').replace(/,/g, '') || '0'
@@ -145,3 +144,6 @@ export const st11ProductDetailHTMLExtractor = (html: string) => {
     deliveryFee,
   }
 }
+
+
+
