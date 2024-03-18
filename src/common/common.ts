@@ -1,5 +1,6 @@
 // import HttpsProxyAgent from 'https-proxy-agent'
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
+import { JSDOM } from 'jsdom'
 
 export async function customRequest(params: {
   url: string
@@ -103,4 +104,82 @@ export function csvToJSON(csvString: string) {
     res.push(obj)
   }
   return res
+}
+
+export function waitForElement(selector: string, dom: JSDOM): Promise<Element | null> {
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      const element = dom.window.document.querySelector(selector)
+      if (element) {
+        clearInterval(interval)
+        resolve(element)
+      }
+    }, 100)
+  })
+}
+
+interface extractPriceParams {
+  xSite: string;
+  productNo: string;
+  sellPrice: string;
+  sellerNo: string;
+}
+
+export async function makeRequestWithAccountDetails({
+  xSite,
+  productNo,
+  sellPrice,
+  sellerNo
+}: extractPriceParams) {
+  const requestData = {
+    productNo,
+    sellPrice,
+    xSite,
+    sellerNo
+  }
+
+  const config: AxiosRequestConfig = {
+    method: 'post',
+    url: 'https://www.11st.co.kr/products/v1/pc/products/max-discount',
+    headers: {
+      'content-type': 'application/json'
+    },
+    data: requestData
+  }
+
+  try {
+    const response = await axios(config)
+    return response.data
+  } catch (error) {
+    console.error('Request failed:', error)
+    return JSON.stringify(error)
+  }
+}
+
+export async function extractScriptContentUsingJsdom(url: string) : Promise<string> {
+  try {
+    const { data: html } = await axios.get(url)
+
+    const { window } = new JSDOM(html)
+
+    const scripts = window.document.querySelectorAll('script')
+    scripts.forEach((script) => {
+      if (script.src) {
+        console.info('External script src:', script.src)
+      } else {
+        console.info('Inline script content:', script.textContent)
+      }
+    })
+    return scripts[0].textContent || ''
+  } catch (error) {
+    console.error('Error fetching page:', error)
+    return ''
+  }
+}
+
+export const extractProductIDFromURl = (url: string) => {
+  const urlObj = new URL(url)
+  const pathSegments = urlObj.pathname.split('/').filter(Boolean)
+  const productId = pathSegments[pathSegments.length - 1]
+  return productId
 }
